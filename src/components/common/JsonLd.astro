@@ -1,0 +1,13 @@
+---
+import type { JsonLdNode } from '~/utils/schema';
+
+export interface Props {
+  schema: JsonLdNode | JsonLdNode[];
+}
+
+const nodes = [Astro.props.schema].flat();
+// "<" is escaped so that no string value can close the script element.
+const serialize = (node: JsonLdNode) => JSON.stringify(node).replace(/</g, '\\u003c');
+---
+
+{nodes.map((node) => <script type="application/ld+json" is:inline set:html={serialize(node)} />)}

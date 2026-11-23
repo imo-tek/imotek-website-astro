@@ -1,0 +1,86 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import Block from '~/components/site/Block.astro';
+import ContactCta from '~/components/site/ContactCta.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import TechIcon from '~/components/site/TechIcon.astro';
+
+import { getContent } from '~/content-data';
+import type { TechGroup } from '~/content-data';
+import { localizePath, t } from '~/i18n';
+import type { Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { technologiesPage: page, technologies } = getContent(locale);
+
+const GROUP_ORDER: TechGroup[] = [
+  'languages',
+  'backend',
+  'frontend',
+  'mobile',
+  'data',
+  'cloud',
+  'ops',
+  'observability',
+  'testing',
+  'ai',
+];
+const groups = GROUP_ORDER.map((group) => ({
+  group,
+  ...page.groups[group],
+  items: technologies.filter((tech) => tech.group === group),
+})).filter(({ items }) => items.length > 0);
+---
+
+<PageLayout
+  locale={locale}
+  pageKey="technologies"
+  metadata={page.seo}
+  breadcrumbs={[{ name: t(locale, 'nav.technologies'), path: localizePath('technologies', locale) }]}
+>
+  <PageHeader title={page.title} intro={[page.intro]} />
+
+  <div class="mx-auto max-w-5xl px-4 md:px-6">
+    <div class="divide-y divide-gray-200 dark:divide-slate-700 border-y border-gray-200 dark:border-slate-700">
+      {
+        groups.map(({ group, title, text, items }) => (
+          <section
+            id={`group-${group}`}
+            class="scroll-mt-[72px] grid gap-6 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-12"
+          >
+            <div>
+              <h2 class="font-heading font-bold text-2xl leading-tighter tracking-tighter text-heading">{title}</h2>
+              <p class="mt-3 text-muted">{text}</p>
+            </div>
+            <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 content-start">
+              {items.map((tech) => (
+                <li
+                  id={tech.key}
+                  class="scroll-mt-[88px] flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-slate-700 p-2 pr-2.5 sm:gap-3 sm:p-2.5 sm:pr-3"
+                >
+                  <TechIcon tech={tech} />
+                  <span
+                    lang="en"
+                    class="min-w-0 break-words text-[13px] sm:text-sm font-semibold text-heading leading-tight"
+                  >
+                    {tech.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <Block>
+    <p class="max-w-3xl text-lg text-muted">{page.closing}</p>
+  </Block>
+
+  <ContactCta locale={locale} cta={page.cta} />
+</PageLayout>

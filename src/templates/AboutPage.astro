@@ -1,0 +1,33 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import Block from '~/components/site/Block.astro';
+import CompanyDetails from '~/components/site/CompanyDetails.astro';
+import ContactCta from '~/components/site/ContactCta.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import Sections from '~/components/site/Sections.astro';
+
+import { getContent } from '~/content-data';
+import { localizePath, t } from '~/i18n';
+import type { Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { about: page } = getContent(locale);
+---
+
+<PageLayout
+  locale={locale}
+  pageKey="about"
+  metadata={page.seo}
+  breadcrumbs={[{ name: t(locale, 'nav.about'), path: localizePath('about', locale) }]}
+>
+  <PageHeader title={page.title} intro={page.intro} />
+  <Sections locale={locale} sections={page.sections} />
+  <Block id="company" title={page.companyTitle}>
+    <CompanyDetails locale={locale} />
+  </Block>
+  <ContactCta locale={locale} cta={page.cta} />
+</PageLayout>

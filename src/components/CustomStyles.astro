@@ -1,23 +1,11 @@
 ---
-import '@fontsource-variable/inter';
-
-// 'DM Sans'
-// Nunito
-// Dosis
-// Outfit
-// Roboto
-// Literata
-// 'IBM Plex Sans'
-// Karla
-// Poppins
-// 'Fira Sans'
-// 'Libre Franklin'
-// Inconsolata
-// Raleway
-// Oswald
-// 'Space Grotesk'
-// Urbanist
+import '~/assets/styles/fonts.css';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import interLatinExt from '@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2?url';
 ---
+
+<link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={interLatinExt} as="font" type="font/woff2" crossorigin />
 
 <style is:inline>
   :root {

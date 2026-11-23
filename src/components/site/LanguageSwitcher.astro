@@ -1,0 +1,24 @@
+---
+import { otherLocale, switchLocalePath, t } from '~/i18n';
+import type { Alternates, Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+  /** Paths of the current page per locale; without a counterpart the link goes to the other home page. */
+  alternates?: Alternates;
+}
+
+const { locale, alternates } = Astro.props;
+const target = otherLocale(locale);
+---
+
+<a
+  href={switchLocalePath(alternates, target)}
+  hreflang={target}
+  lang={target}
+  data-language-switcher
+  aria-label={t(locale, 'lang.switchTo')}
+  title={t(locale, 'lang.switchTo')}
+  class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm font-semibold p-2.5 inline-flex items-center"
+  >{t(locale, 'lang.switchShort')}</a
+>

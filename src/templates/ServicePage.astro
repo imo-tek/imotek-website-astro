@@ -1,0 +1,104 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import Block from '~/components/site/Block.astro';
+import ContactCta from '~/components/site/ContactCta.astro';
+import FaqList from '~/components/site/FaqList.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import ServiceCard from '~/components/site/ServiceCard.astro';
+import Steps from '~/components/site/Steps.astro';
+import TechLinks from '~/components/site/TechLinks.astro';
+
+import { getContent, getService } from '~/content-data';
+import { localizePath, serviceRouteKey, t } from '~/i18n';
+import type { Locale, ServiceKey } from '~/i18n';
+import { serviceSchema } from '~/utils/schema';
+
+export interface Props {
+  locale: Locale;
+  serviceKey: ServiceKey;
+}
+
+const { locale, serviceKey } = Astro.props;
+const service = getService(locale, serviceKey);
+const { servicesHub } = getContent(locale);
+const pageKey = serviceRouteKey(serviceKey);
+const path = localizePath(pageKey, locale);
+const listClass = 'list-disc pl-5 space-y-3 text-muted';
+const h2Class = 'font-heading font-bold text-2xl md:text-3xl leading-tighter tracking-tighter text-heading mb-6';
+---
+
+<PageLayout
+  locale={locale}
+  pageKey={pageKey}
+  metadata={service.seo}
+  breadcrumbs={[
+    { name: t(locale, 'nav.services'), path: localizePath('services', locale) },
+    { name: service.navTitle, path },
+  ]}
+  schema={[serviceSchema({ name: service.title, description: service.seo.description, path, locale })]}
+>
+  <PageHeader title={service.title} intro={service.intro}>
+    <p class="mt-8">
+      <a class="btn-primary" href={localizePath('contact', locale)}>{servicesHub.serviceCta.button}</a>
+    </p>
+  </PageHeader>
+
+  <Block id="what-we-do" title={t(locale, 'service.whatWeDo')}>
+    <dl class="grid gap-x-10 gap-y-8 md:grid-cols-2">
+      {
+        service.whatWeDo.map((item) => (
+          <div>
+            <dt class="font-heading font-semibold text-lg text-heading">{item.title}</dt>
+            <dd class="mt-1 text-muted">{item.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Block>
+
+  <Block id="fit" tinted>
+    <div class="grid gap-10 md:grid-cols-2">
+      <div>
+        <h2 class={h2Class}>{t(locale, 'service.goodFit')}</h2>
+        <ul class={listClass}>{service.goodFit.map((item) => <li>{item}</li>)}</ul>
+      </div>
+      <div>
+        <h2 class={h2Class}>{t(locale, 'service.notFit')}</h2>
+        <ul class={listClass}>{service.notFit.map((item) => <li>{item}</li>)}</ul>
+      </div>
+    </div>
+  </Block>
+
+  {
+    service.techKeys.length > 0 && (
+      <Block id="technologies" title={t(locale, 'service.technologies')}>
+        <TechLinks locale={locale} techKeys={service.techKeys} />
+      </Block>
+    )
+  }
+
+  <Block id="process" title={t(locale, 'service.process')}>
+    <Steps steps={service.process} />
+  </Block>
+
+  <FaqList title={t(locale, 'service.faq')} faqs={service.faqs} />
+
+  <Block id="related" title={t(locale, 'service.related')}>
+    <ul class="grid gap-5 lg:grid-cols-3">
+      {
+        service.relatedKeys.map((key) => (
+          <li>
+            <ServiceCard locale={locale} service={getService(locale, key)} />
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-8">
+      <a class="font-medium text-primary hover:underline" href={localizePath('services', locale)}>
+        {t(locale, 'service.all')}
+      </a>
+    </p>
+  </Block>
+
+  <ContactCta locale={locale} cta={servicesHub.serviceCta} />
+</PageLayout>

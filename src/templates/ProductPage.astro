@@ -1,0 +1,58 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import Block from '~/components/site/Block.astro';
+import ContactCta from '~/components/site/ContactCta.astro';
+import FaqList from '~/components/site/FaqList.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import Sections from '~/components/site/Sections.astro';
+
+import { company, getContent } from '~/content-data';
+import { localizePath, t } from '~/i18n';
+import type { Locale } from '~/i18n';
+import { softwareApplicationSchema } from '~/utils/schema';
+
+export interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { product: page } = getContent(locale);
+---
+
+<PageLayout
+  locale={locale}
+  pageKey="turklex"
+  metadata={page.seo}
+  breadcrumbs={[{ name: t(locale, 'nav.turklex'), path: localizePath('turklex', locale) }]}
+  schema={[softwareApplicationSchema({ name: 'Turklex', description: page.seo.description, url: company.turklexUrl })]}
+>
+  <PageHeader title={page.title} intro={page.intro}>
+    <p class="mt-8">
+      <a class="btn-primary" href={company.turklexUrl}>{page.external.button}</a>
+    </p>
+  </PageHeader>
+
+  <Block id="summary">
+    <dl class="grid max-w-3xl gap-x-8 gap-y-4 sm:grid-cols-[14rem_1fr]">
+      {
+        page.facts.map((fact) => (
+          <>
+            <dt class="font-semibold text-heading">{fact.label}</dt>
+            <dd class="text-muted">{fact.value}</dd>
+          </>
+        ))
+      }
+    </dl>
+  </Block>
+
+  <Sections locale={locale} sections={page.sections} />
+
+  <FaqList title={t(locale, 'service.faq')} faqs={page.faqs} />
+
+  <Block id="try" title={page.external.title}>
+    <p class="max-w-3xl text-lg text-muted">{page.external.text}</p>
+    <p class="mt-6"><a class="btn" href={company.turklexUrl}>{page.external.button}</a></p>
+  </Block>
+
+  <ContactCta locale={locale} cta={page.cta} />
+</PageLayout>
