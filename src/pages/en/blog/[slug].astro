@@ -1,0 +1,16 @@
+---
+import BlogPostPage from '~/templates/BlogPostPage.astro';
+import { fetchPosts } from '~/utils/blog';
+import type { Post } from '~/utils/blog';
+
+export const getStaticPaths = async () =>
+  (await fetchPosts('en')).map((post) => ({ params: { slug: post.slug }, props: { post } }));
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<BlogPostPage post={post} />

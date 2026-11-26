@@ -1,0 +1,16 @@
+---
+import ServicePage from '~/templates/ServicePage.astro';
+import { SERVICE_KEYS, serviceSlug } from '~/i18n';
+import type { ServiceKey } from '~/i18n';
+
+export const getStaticPaths = () =>
+  SERVICE_KEYS.map((serviceKey) => ({ params: { slug: serviceSlug(serviceKey, 'tr') }, props: { serviceKey } }));
+
+interface Props {
+  serviceKey: ServiceKey;
+}
+
+const { serviceKey } = Astro.props;
+---
+
+<ServicePage locale="tr" serviceKey={serviceKey} />

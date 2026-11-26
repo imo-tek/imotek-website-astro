@@ -1,0 +1,89 @@
+---
+import { render } from 'astro:content';
+
+import PageLayout from '~/layouts/PageLayout.astro';
+import Image from '~/components/common/Image.astro';
+
+import { formatDate, localizePath, t } from '~/i18n';
+import { postAlternates } from '~/utils/blog';
+import type { Post } from '~/utils/blog';
+import { blogPostingSchema } from '~/utils/schema';
+
+export interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { locale } = post;
+const { Content, remarkPluginFrontmatter } = await render(post.entry);
+const readingTime = remarkPluginFrontmatter?.readingTime as number | undefined;
+const blogPath = localizePath('blog', locale);
+---
+
+<PageLayout
+  locale={locale}
+  alternates={await postAlternates(post)}
+  metadata={{
+    title: post.title,
+    description: post.excerpt,
+    openGraph: { type: 'article', ...(post.image ? { images: [{ url: post.image }] } : {}) },
+  }}
+  breadcrumbs={[
+    { name: t(locale, 'nav.blog'), path: blogPath },
+    { name: post.title, path: post.path },
+  ]}
+  schema={[
+    blogPostingSchema({
+      title: post.title,
+      description: post.excerpt,
+      path: post.path,
+      locale,
+      publishDate: post.publishDate,
+      updateDate: post.updateDate,
+      author: post.author,
+    }),
+  ]}
+>
+  <article class="mx-auto max-w-3xl px-4 md:px-6 pt-8 pb-16 md:pt-12 md:pb-24">
+    <header>
+      <p class="text-sm text-muted">
+        <time datetime={post.publishDate.toISOString()}>{formatDate(post.publishDate, locale)}</time>
+        {post.author && ` · ${post.author}`}
+        {readingTime && ` · ${t(locale, 'blog.readingTime', { n: readingTime })}`}
+      </p>
+      <h1 class="mt-2 font-heading font-bold text-4xl md:text-5xl leading-tighter tracking-tighter text-heading">
+        {post.title}
+      </h1>
+      <p class="mt-4 text-xl text-muted">{post.excerpt}</p>
+      {
+        post.updateDate && (
+          <p class="mt-2 text-sm text-muted">
+            {t(locale, 'blog.updated', { date: formatDate(post.updateDate, locale) })}
+          </p>
+        )
+      }
+    </header>
+    {
+      post.image && (
+        <Image
+          src={post.image}
+          alt={post.imageAlt ?? ''}
+          class="mt-8 w-full rounded-md"
+          widths={[400, 900]}
+          width={900}
+          sizes="(max-width: 900px) 400px, 900px"
+          loading="eager"
+          decoding="async"
+        />
+      )
+    }
+    <div
+      class="mt-10 prose prose-lg max-w-none dark:prose-invert dark:prose-headings:text-slate-300 prose-headings:font-heading prose-headings:leading-tighter prose-headings:tracking-tighter prose-headings:font-bold prose-a:text-primary dark:prose-a:text-blue-400 prose-img:rounded-md"
+    >
+      <Content />
+    </div>
+    <p class="mt-12">
+      <a class="font-medium text-primary hover:underline" href={blogPath}>{t(locale, 'blog.back')}</a>
+    </p>
+  </article>
+</PageLayout>

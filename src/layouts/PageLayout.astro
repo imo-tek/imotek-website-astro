@@ -2,31 +2,55 @@
 import Layout from '~/layouts/Layout.astro';
 import Header from '~/components/widgets/Header.astro';
 import Footer from '~/components/widgets/Footer.astro';
-import Announcement from '~/components/widgets/Announcement.astro';
+import Breadcrumbs from '~/components/site/Breadcrumbs.astro';
 
+import { ROUTES, alternatesFor, t } from '~/i18n';
+import type { Alternates, Locale, PageKey } from '~/i18n';
+import { getFooterData, getHeaderData } from '~/navigation';
+import { breadcrumbSchema } from '~/utils/schema';
+import type { Crumb, JsonLdNode } from '~/utils/schema';
 import type { MetaData } from '~/types';
 
 export interface Props {
+  locale: Locale;
+  /** Key from `src/i18n/routes.ts`. Sets hreflang and the language switcher target. */
+  pageKey?: PageKey;
+  /** For pages without a route key (blog posts): explicit paths per locale. */
+  alternates?: Alternates;
+  /** Set to false to keep the switcher target but emit no hreflang (e.g. an empty blog index). */
+  hreflang?: boolean;
   metadata?: MetaData;
+  /**
+   * Trail after "Home", ending with the current page. Renders the visible breadcrumb
+   * and the matching BreadcrumbList JSON-LD. Leave out on the home page.
+   */
+  breadcrumbs?: Crumb[];
+  /** Extra JSON-LD nodes (see `src/utils/schema.ts`). */
+  schema?: JsonLdNode[];
 }
 
-const { metadata } = Astro.props;
+const { locale, pageKey, hreflang = true, metadata, breadcrumbs, schema = [] } = Astro.props;
+const alternates = Astro.props.alternates ?? (pageKey ? alternatesFor(pageKey) : undefined);
+
+const trail: Crumb[] | undefined = breadcrumbs && [
+  { name: t(locale, 'nav.home'), path: ROUTES.home[locale] },
+  ...breadcrumbs,
+];
+const allSchema = trail ? [...schema, breadcrumbSchema(trail)] : schema;
 ---
 
-<Layout metadata={metadata}>
-  <!-- İstersen bu Announcement satırını silebilirsin -->
- 
+<Layout locale={locale} metadata={metadata} alternates={hreflang ? alternates : undefined} schema={allSchema}>
+  <a
+    href="#main"
+    class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded focus:bg-page focus:px-4 focus:py-2"
+    >{t(locale, 'site.skipToContent')}</a
+  >
+  <Header locale={locale} alternates={alternates} {...getHeaderData(locale)} />
 
-  <!-- Header artık sabit menüyle geliyor -->
-  <slot name="header">
-    <Header />
-  </slot>
-
-  <main>
+  <main id="main">
+    {trail && <Breadcrumbs locale={locale} items={trail} />}
     <slot />
   </main>
 
-  <slot name="footer">
-    <Footer />
-  </slot>
+  <Footer locale={locale} {...getFooterData(locale)} />
 </Layout>

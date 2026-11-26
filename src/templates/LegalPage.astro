@@ -1,0 +1,32 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import Sections from '~/components/site/Sections.astro';
+
+import { getContent } from '~/content-data';
+import { formatDate, localizePath } from '~/i18n';
+import type { Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+  page: 'privacy' | 'terms';
+}
+
+const { locale, page: pageKey } = Astro.props;
+const page = getContent(locale)[pageKey];
+---
+
+<PageLayout
+  locale={locale}
+  pageKey={pageKey}
+  metadata={page.seo}
+  breadcrumbs={[{ name: page.title, path: localizePath(pageKey, locale) }]}
+>
+  <PageHeader title={page.title} intro={page.intro}>
+    <p class="mt-6 text-sm text-muted">
+      {page.updatedLabel}: <time datetime={page.updated}>{formatDate(page.updated, locale)}</time>
+    </p>
+  </PageHeader>
+  <Sections locale={locale} sections={page.sections} />
+  <div class="pb-12"></div>
+</PageLayout>

@@ -1,0 +1,37 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import Block from '~/components/site/Block.astro';
+import CompanyDetails from '~/components/site/CompanyDetails.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+import Sections from '~/components/site/Sections.astro';
+
+import { company, getContent } from '~/content-data';
+import { localizePath, t } from '~/i18n';
+import type { Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const { contact: page } = getContent(locale);
+const mailto = `mailto:${company.email}?subject=${encodeURIComponent(page.mailSubject)}`;
+---
+
+<PageLayout
+  locale={locale}
+  pageKey="contact"
+  metadata={page.seo}
+  breadcrumbs={[{ name: t(locale, 'nav.contact'), path: localizePath('contact', locale) }]}
+>
+  <PageHeader title={page.title} intro={page.intro}>
+    <p class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <a class="btn-primary" href={mailto}>{page.mailButton}</a>
+      <a class="font-medium hover:underline" href={company.phoneHref}>{company.phone}</a>
+    </p>
+  </PageHeader>
+  <Sections locale={locale} sections={page.sections} />
+  <Block id="details" title={page.detailsTitle}>
+    <CompanyDetails locale={locale} />
+  </Block>
+</PageLayout>

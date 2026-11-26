@@ -1,0 +1,26 @@
+---
+import Block from './Block.astro';
+import type { Faq } from '~/content-data';
+
+export interface Props {
+  title: string;
+  faqs: Faq[];
+}
+
+const { title, faqs } = Astro.props;
+---
+
+{
+  faqs.length > 0 && (
+    <Block id="faq" title={title}>
+      <dl class="max-w-3xl space-y-8">
+        {faqs.map((faq) => (
+          <div>
+            <dt class="font-heading font-semibold text-lg text-heading">{faq.q}</dt>
+            <dd class="mt-2 text-muted">{faq.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </Block>
+  )
+}

@@ -1,72 +1,32 @@
+# Site-wide, language-independent settings.
+# Localized strings live in src/i18n/ui.ts; page copy lives in src/content-data/.
 site:
   name: IMOTEK
   site: 'https://imotek.tr'
   base: '/'
-  trailingSlash: false
+  trailingSlash: true
 
-  googleSiteVerificationId: orcPxI47GSa-cRvY11tUe6iGg2IO_RPvnA1q95iEM3M
-
-# Default SEO metadata
+# Default SEO metadata (each page passes its own title and description)
 metadata:
   title:
     default: IMOTEK
-    template: '%s — IMOTEK'
-  description: "🚀 AI-powered solutions for Startups, Small Businesses, SaaS Websites, Professional Portfolios, Marketing Websites, Landing Pages & Blogs."
+    template: '%s | IMOTEK'
   robots:
     index: true
     follow: true
   openGraph:
     site_name: IMOTEK
     images:
-      - url: '~/assets/images/default.png'
+      - url: '~/assets/images/og-default.png'
         width: 1200
-        height: 628
+        height: 630
     type: website
   twitter:
-    handle: '@imotek'
-    site: '@imotek'
     cardType: summary_large_image
 
 i18n:
-  language: en
+  language: tr
   textDirection: ltr
-
-apps:
-  blog:
-    isEnabled: true
-    postsPerPage: 6
-
-    post:
-      isEnabled: true
-      permalink: '/%slug%'
-      robots:
-        index: true
-
-    list:
-      isEnabled: true
-      pathname: 'blog'
-      robots:
-        index: true
-
-    category:
-      isEnabled: true
-      pathname: 'category'
-      robots:
-        index: true
-
-    tag:
-      isEnabled: true
-      pathname: 'tag'
-      robots:
-        index: false
-
-    isRelatedPostsEnabled: true
-    relatedPostsCount: 4
-
-analytics:
-  vendors:
-    googleAnalytics:
-      id: null
 
 ui:
   theme: 'system' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

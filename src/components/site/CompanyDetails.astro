@@ -1,0 +1,24 @@
+---
+import { company } from '~/content-data';
+import { t } from '~/i18n';
+import type { Locale } from '~/i18n';
+
+export interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<dl class="grid max-w-3xl gap-x-8 gap-y-4 sm:grid-cols-[14rem_1fr]">
+  <dt class="font-semibold text-heading">{t(locale, 'company.legalName')}</dt>
+  <dd class="text-muted">{company.legalName}</dd>
+  <dt class="font-semibold text-heading">{t(locale, 'company.mersis')}</dt>
+  <dd class="text-muted">{company.mersis}</dd>
+  <dt class="font-semibold text-heading">{t(locale, 'company.address')}</dt>
+  <dd class="text-muted"><address class="not-italic">{company.address.full}</address></dd>
+  <dt class="font-semibold text-heading">{t(locale, 'company.phone')}</dt>
+  <dd class="text-muted"><a class="hover:underline" href={company.phoneHref}>{company.phone}</a></dd>
+  <dt class="font-semibold text-heading">{t(locale, 'company.email')}</dt>
+  <dd class="text-muted"><a class="hover:underline" href={`mailto:${company.email}`}>{company.email}</a></dd>
+</dl>

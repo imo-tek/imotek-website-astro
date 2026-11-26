@@ -1,0 +1,94 @@
+---
+import type { Page } from 'astro';
+
+import PageLayout from '~/layouts/PageLayout.astro';
+import PageHeader from '~/components/site/PageHeader.astro';
+
+import { LOCALES, alternatesFor, formatDate, localizePath, t } from '~/i18n';
+import type { Locale } from '~/i18n';
+import { fetchPosts } from '~/utils/blog';
+import type { Post } from '~/utils/blog';
+
+export interface Props {
+  locale: Locale;
+  page: Page<Post>;
+}
+
+const { locale, page } = Astro.props;
+const posts = page.data;
+const isFirstPage = page.currentPage === 1;
+
+// An index is indexable only when it lists posts; hreflang needs posts in both languages.
+const counts = await Promise.all(LOCALES.map(async (l) => (await fetchPosts(l)).length));
+const bothHavePosts = counts.every((count) => count > 0);
+
+const title = isFirstPage
+  ? t(locale, 'blog.title')
+  : `${t(locale, 'blog.title')} · ${t(locale, 'blog.page', { n: page.currentPage })}`;
+---
+
+<PageLayout
+  locale={locale}
+  alternates={alternatesFor('blog')}
+  hreflang={isFirstPage && bothHavePosts}
+  metadata={{
+    title,
+    description: t(locale, 'blog.description'),
+    robots: { index: posts.length > 0, follow: true },
+  }}
+  breadcrumbs={[{ name: t(locale, 'nav.blog'), path: localizePath('blog', locale) }]}
+>
+  <PageHeader title={t(locale, 'blog.title')} intro={[t(locale, 'blog.intro')]} />
+
+  <section class="mx-auto max-w-5xl px-4 md:px-6 pb-16 md:pb-24">
+    {
+      posts.length === 0 ? (
+        <p
+          class="max-w-3xl rounded-lg border border-gray-200 dark:border-slate-700 p-6 text-lg text-muted"
+          data-blog-empty
+        >
+          {t(locale, 'blog.empty')}
+        </p>
+      ) : (
+        <ul class="max-w-3xl divide-y divide-gray-200 dark:divide-slate-700">
+          {posts.map((post) => (
+            <li class="py-8 first:pt-0">
+              <article>
+                <p class="text-sm text-muted">
+                  <time datetime={post.publishDate.toISOString()}>{formatDate(post.publishDate, locale)}</time>
+                </p>
+                <h2 class="mt-1 font-heading font-bold text-2xl leading-tighter tracking-tighter text-heading">
+                  <a class="hover:text-primary" href={post.path}>
+                    {post.title}
+                  </a>
+                </h2>
+                <p class="mt-2 text-muted">{post.excerpt}</p>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      (page.url.prev || page.url.next) && (
+        <nav class="mt-10 flex max-w-3xl justify-between font-medium text-primary">
+          <span>
+            {page.url.prev && (
+              <a class="hover:underline" href={page.url.prev}>
+                {t(locale, 'blog.newer')}
+              </a>
+            )}
+          </span>
+          <span>
+            {page.url.next && (
+              <a class="hover:underline" href={page.url.next}>
+                {t(locale, 'blog.older')}
+              </a>
+            )}
+          </span>
+        </nav>
+      )
+    }
+  </section>
+</PageLayout>

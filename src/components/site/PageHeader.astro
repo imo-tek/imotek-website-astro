@@ -1,0 +1,24 @@
+---
+export interface Props {
+  title: string;
+  intro?: string[];
+}
+
+const { title, intro = [] } = Astro.props;
+---
+
+<header class="mx-auto max-w-5xl px-4 md:px-6 pt-8 pb-10 md:pt-12 md:pb-14">
+  <h1 class="font-heading font-bold text-4xl md:text-5xl leading-tighter tracking-tighter text-heading max-w-4xl">
+    {title}
+  </h1>
+  {
+    intro.length > 0 && (
+      <div class="mt-6 max-w-3xl space-y-4 text-lg md:text-xl text-muted">
+        {intro.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    )
+  }
+  <slot />
+</header>
