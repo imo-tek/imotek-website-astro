@@ -42,7 +42,14 @@ const { locale, metadata = {}, alternates, schema = [] } = Astro.props;
   </head>
 
   <body class="antialiased text-default bg-page tracking-tight">
+    <!--
+      Cloudflare's Email Address Obfuscation rewrites addresses to "[email protected]" and decodes them
+      with a script that does not run again after a View Transitions navigation. The email_off
+      markers keep info@imotek.tr readable and the mailto links working.
+    -->
+    <!--email_off-->
     <slot />
+    <!--/email_off-->
 
     <BasicScripts />
   </body>
